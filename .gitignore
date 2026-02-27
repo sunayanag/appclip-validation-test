@@ -1,0 +1,5 @@
+ICClipTest.xcodeproj/
+DerivedData/
+*.xcworkspace
+xcuserdata/
+.build/
