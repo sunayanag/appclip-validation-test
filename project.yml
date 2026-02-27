@@ -1,0 +1,66 @@
+name: ICClipTest
+options:
+  bundleIdPrefix: com.instacart.icapp
+  deploymentTarget:
+    iOS: "16.0"
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  # Host app (minimal — just reads from shared storage)
+  ICClipTestHost:
+    type: application
+    platform: iOS
+    sources:
+      - path: HostApp
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.instacart.icapp.beta
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: HostApp/Host.entitlements
+
+  # AppClipUI framework (the real instacart-ios code)
+  AppClipUI:
+    type: framework
+    platform: iOS
+    sources:
+      - path: AppClipUI/WebViewController.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.instacart.icapp.beta.AppClipUI
+        GENERATE_INFOPLIST_FILE: YES
+
+  # App Clip (the real instacart-ios App Clip)
+  ICClipTestClip:
+    type: application.on-demand-install-capable
+    platform: iOS
+    sources:
+      - path: AppClip
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.instacart.icapp.beta.appClipTest
+        INFOPLIST_FILE: AppClip/Info.plist
+        CODE_SIGN_ENTITLEMENTS: AppClip/AppClip.entitlements
+    dependencies:
+      - target: AppClipUI
+        embed: true
+      - target: ICClipTestHost
+        embed: false
+        link: false
+
+  # Unit tests
+  ICClipTestTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: ICClipTestHost
+      - target: AppClipUI
